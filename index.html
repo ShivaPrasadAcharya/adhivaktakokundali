@@ -529,7 +529,7 @@
             <div class="dlabel"><i class="ph ph-funnel-simple"></i> Filters</div>
             <div class="chk-wrap" style="margin-bottom:8px">
               <label class="chk-item"><input id="filterRows" type="checkbox" checked> Filter rows</label>
-              <label class="chk-item"><input id="realtime" type="checkbox"> Real-time</label>
+              <label class="chk-item"><input id="realtime" type="checkbox" checked> Real-time</label>
               <label class="chk-item"><input id="caseSensitive" type="checkbox"> Case sensitive</label>
               <label class="chk-item"><input id="exactNepali" type="checkbox"> Exact Nepali</label>
             </div>
@@ -742,7 +742,10 @@ function matchesQuery(row){
     case'not':return!words.some(w=>text.includes(w));  // exclude rows containing any word
     case'starts':return text.startsWith(q);
     case'regex':try{return new RegExp(rawQ,$('caseSensitive').checked?'':'i').test(rowText(row,$('column').value));}catch(e){return false;}
-    default:return text.includes(q);
+    default:{
+      const qNoSpace=q.replace(/\s+/g,'');
+      return qNoSpace===q?text.includes(q):text.replace(/\s+/g,'').includes(qNoSpace);
+    }
   }
 }
 function passesFilters(row){
@@ -991,7 +994,10 @@ $('q').addEventListener('keydown',e=>{
 $('q').addEventListener('focus',()=>{shOpen();});
 $('q').addEventListener('input',()=>{
   shRender();// refresh history list while typing (filter could be added)
-  if($('realtime').checked)applySearch();
+  if($('realtime').checked){
+    const q=$('q').value.trim();
+    if(q.length===0||q.length>=3)applySearch();
+  }
 });
 
 // History list interactions
