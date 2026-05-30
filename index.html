@@ -22,7 +22,10 @@
       --shadow-lg:0 8px 32px rgba(24,22,15,.12),0 3px 10px rgba(24,22,15,.07);
       --thead:#f3f1ec;--row:#fff;--row-alt:#faf9f6;--row-hover:#fdf6f2;
       --r:9px;--rl:14px;--rxl:20px;
-      --ribbon-h:54px;
+      /* [FIX 2] Hero theming tokens — light mode */
+      --hero-bg:#18160f;--hero-text:#f0ede7;--hero-sub:rgba(240,237,231,.45);
+      --hero-btn-bg:rgba(255,255,255,.1);--hero-btn-border:rgba(255,255,255,.18);
+      --hero-btn-text:rgba(240,237,231,.85);--hero-btn-hover:rgba(255,255,255,.2);
     }
     html[data-theme=dark]{
       --bg:#121009;--bg2:#1a1714;--surface:#1e1b16;--surface2:#171410;--card:#201d18;
@@ -34,6 +37,10 @@
       --danger:#f47068;--success:#2db88a;
       --shadow:0 2px 12px rgba(0,0,0,.4);--shadow-lg:0 8px 32px rgba(0,0,0,.5);
       --thead:#1a1714;--row:#1e1b16;--row-alt:#1b1814;--row-hover:#272219;
+      /* [FIX 2] Hero theming tokens — dark mode: lighter card so it contrasts with page */
+      --hero-bg:#2a2520;--hero-text:#ede9e1;--hero-sub:rgba(237,233,225,.4);
+      --hero-btn-bg:rgba(255,255,255,.07);--hero-btn-border:rgba(255,255,255,.12);
+      --hero-btn-text:rgba(237,233,225,.8);--hero-btn-hover:rgba(255,255,255,.13);
     }
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     html{scroll-behavior:smooth}
@@ -47,19 +54,30 @@
     }
     .wrap{max-width:1540px;margin:0 auto;padding:14px 14px}
 
-    /* ─ HERO ─ */
+    /* ─ HERO [FIX 2: use CSS vars so dark mode works] ─ */
     .hero{
-      background:var(--text);color:var(--bg);
-      border-radius:var(--rxl);padding:14px 22px 14px;
+      background:var(--hero-bg);
+      border-radius:var(--rxl);padding:14px 22px;
       margin-bottom:10px;position:relative;overflow:hidden;
       box-shadow:var(--shadow-lg);display:flex;align-items:center;justify-content:space-between;gap:12px;
+      transition:background .2s;
     }
-    .hero::after{content:'⚖';position:absolute;right:-4px;top:-18px;font-size:120px;opacity:.04;line-height:1;pointer-events:none;font-family:'Playfair Display',serif}
-    .hero h1{font-family:'Playfair Display',Georgia,serif;font-size:clamp(17px,2vw,26px);font-weight:700;color:#f0ede7;line-height:1.1}
-    .hero-sub{font-size:11px;color:rgba(240,237,231,.45);font-weight:400;margin-top:2px;letter-spacing:.02em}
+    .hero::after{content:'⚖';position:absolute;right:-4px;top:-18px;font-size:120px;opacity:.04;line-height:1;pointer-events:none;font-family:'Playfair Display',serif;color:var(--hero-text)}
+    .hero h1{font-family:'Playfair Display',Georgia,serif;font-size:clamp(17px,2vw,26px);font-weight:700;color:var(--hero-text);line-height:1.1}
+    .hero-sub{font-size:11px;color:var(--hero-sub);font-weight:400;margin-top:2px;letter-spacing:.02em}
     .hero-actions{display:flex;align-items:center;gap:6px;position:relative;z-index:1;flex-shrink:0}
 
-    /* ─ STICKY RIBBON ─ */
+    /* [FIX 2] Hero buttons use CSS vars */
+    .hbtn{
+      width:34px;height:34px;display:inline-flex;align-items:center;justify-content:center;
+      background:var(--hero-btn-bg);border:1px solid var(--hero-btn-border);
+      color:var(--hero-btn-text);border-radius:var(--r);cursor:pointer;transition:background .15s;flex-shrink:0;
+      text-decoration:none;
+    }
+    .hbtn:hover{background:var(--hero-btn-hover)}
+    .hbtn i{font-size:17px}
+
+    /* ─ STICKY RIBBON [FIX 4: position:sticky, top:0] ─ */
     .ribbon{position:sticky;top:0;z-index:50;margin-bottom:10px}
     .ribbon-panel{
       background:var(--surface);border:1px solid var(--line);
@@ -88,6 +106,37 @@
     .search-clear i{font-size:10px}
     .search-input:not(:placeholder-shown)~.search-clear{display:flex}
 
+    /* [FIX 1] Search history dropdown */
+    .search-history-list{
+      position:absolute;top:calc(100% + 4px);left:0;right:0;z-index:1500;
+      background:var(--card);border:1px solid var(--line);border-radius:var(--r);
+      box-shadow:var(--shadow-lg);overflow:hidden;display:none;
+    }
+    .search-history-list.open{display:block}
+    .sh-item{
+      display:flex;align-items:center;gap:8px;padding:7px 10px;cursor:pointer;
+      font-size:13px;color:var(--text2);transition:background .12s;
+    }
+    .sh-item:hover{background:var(--surface2)}
+    .sh-item i{font-size:14px;color:var(--text3);flex-shrink:0}
+    .sh-item-text{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .sh-del{
+      flex-shrink:0;width:16px;height:16px;display:flex;align-items:center;justify-content:center;
+      border:none;background:none;color:var(--text3);cursor:pointer;border-radius:3px;padding:0;
+    }
+    .sh-del:hover{color:var(--danger)}
+    .sh-del i{font-size:11px}
+    .sh-header{
+      display:flex;align-items:center;justify-content:space-between;
+      padding:5px 10px 4px;border-bottom:1px solid var(--line);
+      font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;
+    }
+    .sh-clear-all{
+      font-size:10px;font-weight:600;color:var(--brand);border:none;background:none;cursor:pointer;padding:0;
+    }
+    .sh-clear-all:hover{text-decoration:underline}
+    .sh-empty{padding:10px;font-size:12px;color:var(--text3);text-align:center}
+
     /* ─ TOOLBAR BUTTONS ─ */
     .tbtn{
       width:36px;height:36px;display:inline-flex;align-items:center;justify-content:center;
@@ -108,15 +157,6 @@
     .tbtn.red:hover{filter:brightness(1.1)}
     .tbtn.red i{color:#fff!important}
     .tbtn.active{background:var(--brand-soft);border-color:var(--brand);color:var(--brand)}
-
-    /* Hero icon buttons */
-    .hbtn{
-      width:34px;height:34px;display:inline-flex;align-items:center;justify-content:center;
-      background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);
-      color:rgba(240,237,231,.85);border-radius:var(--r);cursor:pointer;transition:background .15s;flex-shrink:0;
-    }
-    .hbtn:hover{background:rgba(255,255,255,.2)}
-    .hbtn i{font-size:17px}
 
     /* Toggle pills */
     .tpill{
@@ -267,13 +307,13 @@
     [data-tip]{position:relative}
     [data-tip]:hover::after{
       content:attr(data-tip);position:absolute;left:50%;top:calc(100% + 6px);
-      transform:translateX(-50%);z-index:1000;background:var(--text);color:var(--bg);
+      transform:translateX(-50%);z-index:9999;background:var(--text);color:var(--bg);
       padding:4px 8px;border-radius:6px;font-size:11px;font-weight:500;
       white-space:nowrap;box-shadow:var(--shadow);pointer-events:none;
     }
     [data-tip]:hover::before{
       content:'';position:absolute;left:50%;top:calc(100% + 1px);transform:translateX(-50%);
-      border:4px solid transparent;border-bottom-color:var(--text);z-index:1001;
+      border:4px solid transparent;border-bottom-color:var(--text);z-index:9999;
     }
 
     /* ─ RESPONSIVE ─ */
@@ -294,26 +334,30 @@
 <body>
 <div class="wrap" id="top">
 
-<!-- HERO -->
+<!-- HERO [FIX 2: uses CSS vars; FIX 3: README link added] -->
 <header class="hero">
   <div style="position:relative;z-index:1">
     <h1>अधिवक्ता सूची</h1>
     <p class="hero-sub">Nepal Bar Council &nbsp;·&nbsp; विकासकर्ता: शिवप्रसाद आचार्य &nbsp;·&nbsp; अद्यावधिक: २०८२</p>
   </div>
   <div class="hero-actions">
+    <!-- [FIX 3] README link -->
+    <a href="README.md" target="_blank" class="hbtn" aria-label="Open README" data-tip="README / Help">
+      <i class="ph ph-book-open-text"></i>
+    </a>
     <button id="themeBtn" class="hbtn" aria-label="Toggle theme" data-tip="Light / Dark">
       <i class="ph ph-moon-stars" id="themeIcon"></i>
     </button>
   </div>
 </header>
 
-<!-- STICKY RIBBON -->
+<!-- STICKY RIBBON [FIX 4: position:sticky via CSS, search bar stays on scroll] -->
 <section class="ribbon">
   <div class="ribbon-panel">
     <div class="ribbon-main">
 
-      <!-- Search — fluid, min 20% -->
-      <div class="search-wrap">
+      <!-- Search — fluid, min 20%; [FIX 1] history dropdown attached here -->
+      <div class="search-wrap" id="searchWrap">
         <span class="search-icon-el"><i class="ph ph-magnifying-glass"></i></span>
         <input id="q" class="search-input" type="search"
           placeholder="नाम, English Name, Licence No, ठेगाना, मिति…"
@@ -321,6 +365,14 @@
         <button class="search-clear" id="clearQ" aria-label="Clear">
           <i class="ph ph-x"></i>
         </button>
+        <!-- [FIX 1] Search history dropdown -->
+        <div class="search-history-list" id="searchHistory">
+          <div class="sh-header">
+            <span><i class="ph ph-clock-counter-clockwise"></i> Recent</span>
+            <button class="sh-clear-all" id="shClearAll">Clear all</button>
+          </div>
+          <div id="shItems"></div>
+        </div>
       </div>
 
       <!-- Search button -->
@@ -338,12 +390,12 @@
         <input id="shriToggle" type="checkbox" checked> श्री
       </label>
 
-      <!-- Nav dropdown -->
-      <details class="drop">
-        <summary class="tbtn" data-tip="Navigation &amp; Jump">
+      <!-- [FIX 7] Nav dropdown — converted from <details> to div-based so hover keeps it open -->
+      <div class="drop" id="navDrop">
+        <button class="tbtn" id="navDropBtn" data-tip="Navigation &amp; Jump" aria-expanded="false">
           <i class="ph ph-compass"></i>
-        </summary>
-        <div class="drop-menu" style="min-width:240px">
+        </button>
+        <div class="drop-menu" id="navDropMenu" style="min-width:240px;display:none">
           <div class="dsec">
             <div class="dlabel"><i class="ph ph-crosshair"></i> Match Navigation</div>
             <div class="nav-row" style="margin-bottom:10px">
@@ -369,7 +421,7 @@
               <button id="goPageBtn" class="tbtn primary" data-tip="Go"><i class="ph ph-arrow-right"></i></button>
             </div>
           </div>
-          <!-- Inline stats inside nav dropdown -->
+          <!-- Inline stats -->
           <div style="border-top:1px solid var(--line);margin-top:10px;padding-top:10px">
             <div style="display:flex;gap:10px;flex-wrap:wrap;font-size:12px;color:var(--text2)">
               <span><i class="ph ph-file-text" style="color:var(--brand)"></i> <strong id="shownCount">0</strong>/<span id="totalCount">0</span> records</span>
@@ -377,10 +429,10 @@
             </div>
           </div>
         </div>
-      </details>
+      </div>
 
-      <!-- Settings dropdown -->
-      <details class="drop">
+      <!-- Settings dropdown (kept as <details> — click-toggle, close on outside click) -->
+      <details class="drop" id="settingsDrop">
         <summary class="tbtn" data-tip="Search · Filter · Sort · Columns">
           <i class="ph ph-sliders-horizontal"></i>
         </summary>
@@ -403,8 +455,10 @@
                 </select>
               </div>
               <div class="field"><label>Mode</label>
+                <!-- [FIX 6] NOT option added -->
                 <select id="mode">
                   <option value="contains">Contains</option>
+                  <option value="not">NOT (Exclude)</option>
                   <option value="allWords">All words</option>
                   <option value="anyWords">Any word</option>
                   <option value="starts">Starts with</option>
@@ -413,7 +467,7 @@
               </div>
               <div class="field"><label>Per page</label>
                 <select id="pageSize">
-                                   <option>100</option><option>25</option><option>50</option><option>200</option><option>500</option><option>1000</option><option>ALL</option>
+                  <option>25</option><option>100</option><option>200</option><option>500</option><option>ALL</option>
                 </select>
               </div>
               <div class="field"><label>Actions</label>
@@ -515,7 +569,7 @@
   </div>
 </main>
 
-<!-- PAGER -->
+<!-- PAGER [FIX 5: bottom pager buttons do NOT scroll to top] -->
 <div class="pager">
   <span class="page-info" id="pageInfo">Page 1 of 1</span>
   <div class="pager-btns">
@@ -670,10 +724,13 @@ function getRegex(){
   const flags=$('caseSensitive').checked?'g':'gi';
   try{
     if($('mode').value==='regex')return new RegExp(q,flags);
-    if($('mode').value==='anyWords'||$('mode').value==='allWords')return new RegExp(q.split(/\s+/).filter(Boolean).map(escReg).join('|'),flags);
+    if($('mode').value==='anyWords'||$('mode').value==='allWords'||$('mode').value==='not')
+      return new RegExp(q.split(/\s+/).filter(Boolean).map(escReg).join('|'),flags);
     return new RegExp(escReg(q),flags);
   }catch(e){return null;}
 }
+
+/* [FIX 6] matchesQuery handles 'not' mode */
 function matchesQuery(row){
   const rawQ=$('q').value.trim();if(!rawQ)return true;
   const q=normalize(rawQ),text=normalize(rowText(row,$('column').value));
@@ -681,6 +738,7 @@ function matchesQuery(row){
   switch($('mode').value){
     case'allWords':return words.every(w=>text.includes(w));
     case'anyWords':return words.some(w=>text.includes(w));
+    case'not':return!words.some(w=>text.includes(w));  // exclude rows containing any word
     case'starts':return text.startsWith(q);
     case'regex':try{return new RegExp(rawQ,$('caseSensitive').checked?'':'i').test(rowText(row,$('column').value));}catch(e){return false;}
     default:return text.includes(q);
@@ -755,9 +813,11 @@ function normalizedHighlightHtml(text,q){
   for(const[a,b]of ranges){out+=escHtml(original.slice(last,a))+`<mark>${escHtml(original.slice(a,b))}</mark>`;last=b;}
   return out+escHtml(original.slice(last));
 }
+
+/* [FIX 6] NOT mode: no highlights (exclusion, nothing to mark) */
 function cellHtml(text){
   const q=$('q').value.trim();let safe=escHtml(text);
-  if(!q)return safe;
+  if(!q||$('mode').value==='not')return safe;
   if($('mode').value!=='regex'&&$('nepaliNorm')&&$('nepaliNorm').checked&&!$('exactNepali').checked){
     if($('mode').value==='allWords'||$('mode').value==='anyWords'){
       const words=q.split(/\s+/).filter(Boolean).sort((a,b)=>b.length-a.length);
@@ -852,22 +912,96 @@ function copyTableToClipboard(){
   copyText(lines.join('\n'),`${state.filtered.length.toLocaleString()} rows copied`);
 }
 
-/* Theme */
+/* ── [FIX 1] SEARCH HISTORY (persistent via localStorage) ── */
+const SH_KEY='advSearchHistory';
+const SH_MAX=20;
+function shLoad(){try{return JSON.parse(localStorage.getItem(SH_KEY)||'[]');}catch(e){return[];}}
+function shSave(arr){try{localStorage.setItem(SH_KEY,JSON.stringify(arr));}catch(e){}}
+function shAdd(q){
+  if(!q)return;
+  let h=shLoad().filter(x=>x!==q);
+  h.unshift(q);
+  if(h.length>SH_MAX)h=h.slice(0,SH_MAX);
+  shSave(h);
+}
+function shRemove(q){shSave(shLoad().filter(x=>x!==q));}
+function shRender(){
+  const h=shLoad();
+  const container=$('shItems');
+  if(!h.length){container.innerHTML=`<div class="sh-empty">No recent searches</div>`;return;}
+  container.innerHTML=h.map(q=>`
+    <div class="sh-item" data-q="${escHtml(q)}">
+      <i class="ph ph-clock-counter-clockwise"></i>
+      <span class="sh-item-text">${escHtml(q)}</span>
+      <button class="sh-del" data-del="${escHtml(q)}" title="Remove"><i class="ph ph-x"></i></button>
+    </div>`).join('');
+}
+function shOpen(){shRender();$('searchHistory').classList.add('open');}
+function shClose(){$('searchHistory').classList.remove('open');}
+
+/* ── [FIX 2] THEME ── */
 function setTheme(theme){
   document.documentElement.dataset.theme=theme;
   localStorage.setItem('advTheme',theme);
   $('themeIcon').className=theme==='dark'?'ph ph-sun':'ph ph-moon-stars';
 }
 
+/* ── [FIX 7] NAV DROPDOWN: hover-aware, close on outside click only ── */
+let navDropOpen=false;
+let navHideTimer=null;
+function navOpen(){
+  clearTimeout(navHideTimer);
+  $('navDropMenu').style.display='block';
+  $('navDropBtn').setAttribute('aria-expanded','true');
+  navDropOpen=true;
+}
+function navClose(){
+  $('navDropMenu').style.display='none';
+  $('navDropBtn').setAttribute('aria-expanded','false');
+  navDropOpen=false;
+}
+function navScheduleClose(){
+  navHideTimer=setTimeout(()=>{navClose();},120);
+}
+$('navDropBtn').addEventListener('click',()=>{navDropOpen?navClose():navOpen();});
+$('navDrop').addEventListener('mouseenter',()=>{clearTimeout(navHideTimer);if(!navDropOpen)navOpen();});
+$('navDrop').addEventListener('mouseleave',()=>{navScheduleClose();});
+$('navDropMenu').addEventListener('mouseenter',()=>{clearTimeout(navHideTimer);});
+$('navDropMenu').addEventListener('mouseleave',()=>{navScheduleClose();});
+
 /* ── EVENTS ── */
-$('searchBtn').addEventListener('click',()=>applySearch());
-$('goBtn').addEventListener('click',()=>applySearch());
-$('clearQ').addEventListener('click',()=>{$('q').value='';applySearch();$('q').focus();});
+$('searchBtn').addEventListener('click',()=>{
+  const q=$('q').value.trim();if(q)shAdd(q);
+  shClose();applySearch();
+});
+$('goBtn').addEventListener('click',()=>{
+  const q=$('q').value.trim();if(q)shAdd(q);
+  shClose();applySearch();
+});
+$('clearQ').addEventListener('click',()=>{$('q').value='';shClose();applySearch();$('q').focus();});
 $('goPageBtn').addEventListener('click',goToPage);
 $('goPageInput').addEventListener('keydown',e=>{if(e.key==='Enter')goToPage();});
 $('clearBtn').addEventListener('click',clearAll);
-$('q').addEventListener('keydown',e=>{if(e.key==='Enter')applySearch();});
-$('q').addEventListener('input',()=>{if($('realtime').checked)applySearch();});
+
+$('q').addEventListener('keydown',e=>{
+  if(e.key==='Enter'){const q=$('q').value.trim();if(q)shAdd(q);shClose();applySearch();}
+  else if(e.key==='Escape'){shClose();}
+});
+$('q').addEventListener('focus',()=>{shOpen();});
+$('q').addEventListener('input',()=>{
+  shRender();// refresh history list while typing (filter could be added)
+  if($('realtime').checked)applySearch();
+});
+
+// History list interactions
+$('shItems').addEventListener('click',e=>{
+  const del=e.target.closest('.sh-del');
+  if(del){e.stopPropagation();shRemove(del.dataset.del);shRender();return;}
+  const item=e.target.closest('.sh-item');
+  if(item){$('q').value=item.dataset.q;shClose();applySearch();}
+});
+$('shClearAll').addEventListener('click',()=>{shSave([]);shRender();});
+
 ['column','mode','pageSize','filterRows','caseSensitive','exactNepali','nepaliNorm','shriToggle','sexFilter','typeFilter','licFrom','licTo']
   .forEach(id=>$(id).addEventListener('change',()=>applySearch()));
 $('sortApply').addEventListener('click',()=>{state.sortCol=$('sortColumn').value;state.sortOrder=$('sortOrder').value;applySearch();});
@@ -883,19 +1017,43 @@ $('tbody').addEventListener('click',e=>{
   btn.innerHTML=CHECK_ICON;btn.classList.add('copied');
   setTimeout(()=>{btn.innerHTML=COPY_ICON;btn.classList.remove('copied');},900);
 });
-$('firstPage').addEventListener('click',()=>{state.page=1;render();window.scrollTo({top:0,behavior:'smooth'});});
-$('prevPage').addEventListener('click',()=>{state.page--;render();window.scrollTo({top:0,behavior:'smooth'});});
-$('nextPage').addEventListener('click',()=>{state.page++;render();window.scrollTo({top:0,behavior:'smooth'});});
-$('lastPage').addEventListener('click',()=>{state.page=pageMeta().pages;render();window.scrollTo({top:0,behavior:'smooth'});});
-$('firstPageTop')?.addEventListener('click',()=>$('firstPage').click());
-$('prevPageTop')?.addEventListener('click',()=>$('prevPage').click());
-$('nextPageTop')?.addEventListener('click',()=>$('nextPage').click());
-$('lastPageTop')?.addEventListener('click',()=>$('lastPage').click());
+
+/* [FIX 5] Bottom pager buttons — NO scroll to top */
+$('firstPage').addEventListener('click',()=>{state.page=1;render();});
+$('prevPage').addEventListener('click',()=>{state.page--;render();});
+$('nextPage').addEventListener('click',()=>{state.page++;render();});
+$('lastPage').addEventListener('click',()=>{state.page=pageMeta().pages;render();});
+
+/* Top nav pager buttons still scroll to top */
+$('firstPageTop')?.addEventListener('click',()=>{state.page=1;render();window.scrollTo({top:0,behavior:'smooth'});});
+$('prevPageTop')?.addEventListener('click',()=>{state.page--;render();window.scrollTo({top:0,behavior:'smooth'});});
+$('nextPageTop')?.addEventListener('click',()=>{state.page++;render();window.scrollTo({top:0,behavior:'smooth'});});
+$('lastPageTop')?.addEventListener('click',()=>{state.page=pageMeta().pages;render();window.scrollTo({top:0,behavior:'smooth'});});
+
 window.addEventListener('scroll',()=>{$('backTop').style.display=scrollY>500?'flex':'none';});
 $('backTop').addEventListener('click',()=>window.scrollTo({top:0,behavior:'smooth'}));
-window.addEventListener('keydown',e=>{if(e.altKey&&e.key==='ArrowRight')nextHit(1);if(e.altKey&&e.key==='ArrowLeft')nextHit(-1);});
-document.addEventListener('click',e=>{document.querySelectorAll('details.drop[open]').forEach(d=>{if(!d.contains(e.target))d.removeAttribute('open');});});
-document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('details.drop[open]').forEach(d=>d.removeAttribute('open'));});
+window.addEventListener('keydown',e=>{
+  if(e.altKey&&e.key==='ArrowRight')nextHit(1);
+  if(e.altKey&&e.key==='ArrowLeft')nextHit(-1);
+});
+
+/* Global outside-click: close settings <details> and search history; nav handled separately */
+document.addEventListener('click',e=>{
+  // Close settings dropdown if click is outside it
+  const sd=$('settingsDrop');
+  if(sd&&sd.open&&!sd.contains(e.target))sd.removeAttribute('open');
+  // Close nav dropdown if click is outside it
+  if(navDropOpen&&!$('navDrop').contains(e.target))navClose();
+  // Close search history if click is outside search wrap
+  if(!$('searchWrap').contains(e.target))shClose();
+});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){
+    if($('settingsDrop').open)$('settingsDrop').removeAttribute('open');
+    if(navDropOpen)navClose();
+    shClose();
+  }
+});
 
 /* ── BOOT ── */
 async function bootTable(){
