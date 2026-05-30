@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="ne">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>README — अधिवक्ता सूची</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <style>
+    :root{color:#111;background:#fff;font-family:Inter,system-ui,sans-serif;line-height:1.65}
+    body{margin:0;padding:24px;max-width:980px;min-height:100vh;background:#fbfbfb}
+    a{color:#c45a16;text-decoration:none}a:hover{text-decoration:underline}
+    header{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:28px}
+    header h1{font-size:clamp(1.5rem,2vw,2.3rem);margin:0}
+    header p{margin:0;color:#555;font-size:0.95rem}
+    .top-actions a{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;border:1px solid #ccc;background:#fff;color:#111;font-size:0.95rem}
+    .content{background:#fff;border:1px solid #e1e1e1;border-radius:18px;padding:24px;box-shadow:0 18px 40px rgba(0,0,0,.04)}
+    h2,h3,h4,h5,h6{margin-top:2rem;margin-bottom:1rem;font-weight:700}
+    p{margin:0 0 1rem}
+    ul,ol{margin:0 0 1rem 1.5rem}
+    li{margin:0.4rem 0}
+    pre,code{font-family:ui-monospace,monospace;font-size:0.95rem}
+    pre{background:#f7f7f7;padding:14px 16px;border-radius:12px;overflow:auto}
+    code{background:#f2f2f2;padding:0 4px;border-radius:6px}
+    blockquote{margin:0 0 1rem 0;padding:12px 18px;border-left:4px solid #c45a16;background:#fff7ef;color:#5b3a26}
+    table{width:100%;border-collapse:collapse;margin:0 0 1.5rem}
+    th,td{border:1px solid #d8d8d8;padding:10px 12px;text-align:left}
+    th{background:#f7f7f7}
+    hr{border:none;height:1px;background:#ddd;margin:2rem 0}
+    .status{color:#555;font-size:0.95rem;margin-top:0.5rem}
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>README — अधिवक्ता सूची</h1>
+      <p>Local help page generated from the repository README.</p>
+    </div>
+    <div class="top-actions">
+      <a href="index.html">← Back to Search</a>
+      <a href="README.md" target="_blank" rel="noreferrer">Open raw README.md</a>
+    </div>
+  </header>
+  <article class="content" id="content">
+    <p>Loading README…</p>
+  </article>
+  <p class="status" id="status"></p>
+  <script>
+    const statusEl=document.getElementById('status');
+    function escapeHtml(text){
+      return text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+    function renderInline(text){
+      return escapeHtml(text)
+        .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+        .replace(/__(.+?)__/g,'<strong>$1</strong>')
+        .replace(/\*(.+?)\*/g,'<em>$1</em>')
+        .replace(/_(.+?)_/g,'<em>$1</em>')
+        .replace(/`([^`]+)`/g,'<code>$1</code>')
+        .replace(/\[([^\]]+)\]\(([^)]+)\)/g,'<a href="$2" target="_blank" rel="noreferrer">$1</a>');
+    }
+    function parseMarkdown(markdown){
+      const lines=markdown.replace(/\r\n/g,'\n').split('\n');
+      const html=[];
+      let inCode=false, codeLines=[], listType=null, listBuffer=[];
+      let inBlockquote=false, blockquoteLines=[];
+      let tableHeader=null, tableRows=[];
+
+      function flushParagraph(text){
+        if(!text.trim())return;
+        html.push(`<p>${renderInline(text.trim())}</p>`);
+      }
+      function flushList(){
+        if(!listType) return;
+        const tag=listType==='ol'?'ol':'ul';
+        html.push(`<${tag}>${listBuffer.map(item=>`<li>${renderInline(item)}</li>`).join('')}</${tag}>`);
+        listType=null;listBuffer=[];
+      }
+      function flushBlockquote(){
+        if(!inBlockquote) return;
+        html.push(`<blockquote>${renderInline(blockquoteLines.join(' '))}</blockquote>`);
+        inBlockquote=false;blockquoteLines=[];
+      }
+      function flushTable(){
+        if(!tableHeader) return;
+        html.push('<table><thead><tr>' + tableHeader.map(cell=>`<th>${renderInline(cell.trim())}</th>`).join('') + '</tr></thead>');
+        if(tableRows.length){
+          html.push('<tbody>' + tableRows.map(row=>`<tr>${row.map(cell=>`<td>${renderInline(cell.trim())}</td>`).join('')}</tr>`).join('') + '</tbody>');
+        }
+        html.push('</table>');
+        tableHeader=null;tableRows=[];
+      }
+
+      for(let i=0;i<lines.length;i++){
+        let line=lines[i];
+        if(line.startsWith('```')){
+          if(inCode){
+            html.push('<pre><code>' + escapeHtml(codeLines.join('\n')) + '</code></pre>');
+            inCode=false;codeLines=[];
+          } else { inCode=true; }
+          continue;
+        }
+        if(inCode){ codeLines.push(line); continue; }
+        if(/^\s*$/.test(line)){
+          flushList();flushBlockquote();flushTable();continue;
+        }
+        const heading=line.match(/^(#{1,6})\s+(.*)$/);
+        if(heading){ flushList();flushBlockquote();flushTable(); html.push(`<h${heading[1].length}>${renderInline(heading[2].trim())}</h${heading[1].length}>`); continue; }
+        const hr=line.match(/^([-*_]){3,}\s*$/);
+        if(hr){ flushList();flushBlockquote();flushTable(); html.push('<hr>'); continue; }
+        const blockquote=line.match(/^>\s?(.*)$/);
+        if(blockquote){ flushList();flushTable(); inBlockquote=true; blockquoteLines.push(blockquote[1]); continue; }
+        const listItem=line.match(/^\s*([-*+])\s+(.*)$/);
+        const orderedItem=line.match(/^\s*(\d+)\.\s+(.*)$/);
+        if(listItem||orderedItem){
+          flushBlockquote();flushTable();
+          const target=listItem?'ul':'ol';
+          if(listType!==target){ flushList(); listType=target; }
+          listBuffer.push((listItem||orderedItem)[2]);
+          continue;
+        }
+        const tableSep=lines[i+1] && /^[ \t]*\|?\s*[:-]+\s*(\|\s*[:-]+\s*)+$/;
+        if(line.includes('|') && tableSep){
+          flushList();flushBlockquote();
+          tableHeader=line.split('|').map(cell=>cell.trim()).filter(Boolean);
+          i++;
+          while(i+1<lines.length && lines[i+1].includes('|')){
+            i++; tableRows.push(lines[i].split('|').map(cell=>cell.trim()).filter(Boolean));
+          }
+          flushTable();
+          continue;
+        }
+        flushList();flushBlockquote();flushTable();
+        flushParagraph(line);
+      }
+      flushList();flushBlockquote();flushTable();
+      return html.join('\n');
+    }
+
+    async function loadReadme(){
+      try{
+        const res=await fetch('README.md', {cache:'no-store'});
+        if(!res.ok) throw new Error('Unable to fetch README.md');
+        const text=await res.text();
+        document.getElementById('content').innerHTML=parseMarkdown(text);
+        statusEl.textContent='README loaded successfully.';
+      } catch(err){
+        document.getElementById('content').innerHTML='<p>Unable to load README.md directly. Open the raw file instead:</p><p><a href="README.md" target="_blank" rel="noreferrer">README.md</a></p>';
+        statusEl.textContent='If you opened this page from file://, try serving the folder over HTTP.';
+      }
+    }
+    loadReadme();
+  </script>
+</body>
+</html>

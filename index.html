@@ -7,6 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/regular/style.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/fill/style.css">
   <style>
@@ -342,7 +343,7 @@
   </div>
   <div class="hero-actions">
     <!-- [FIX 3] README link -->
-    <a href="README.md" target="_blank" class="hbtn" aria-label="Open README" data-tip="README / Help">
+    <a href="README.html" target="_blank" class="hbtn" aria-label="Open README" data-tip="README / Help">
       <i class="ph ph-book-open-text"></i>
     </a>
     <button id="themeBtn" class="hbtn" aria-label="Toggle theme" data-tip="Light / Dark">
@@ -1061,14 +1062,25 @@ async function bootTable(){
     let saved='light';try{saved=localStorage.getItem('advTheme')||'light';}catch(e){}
     setTheme(saved);
     const empty=$('empty');
-    if(empty){empty.hidden=false;empty.innerHTML='<div class="empty-state">Loading data files…</div>';}
+    const startTime=performance.now();
+    let timerId=null;
+    if(empty){
+      empty.hidden=false;
+      empty.innerHTML='<div class="empty-state">Loading data files… <span id="loadingTimer">0.0s</span></div>';
+      timerId=setInterval(()=>{
+        const timerEl=$('loadingTimer');
+        if(timerEl){timerEl.textContent=`${((performance.now()-startTime)/1000).toFixed(1)}s`;}
+      },100);
+    }
     const result=await loadAdvocateDataChunks();
+    clearInterval(timerId);
+    const elapsed=((performance.now()-startTime)/1000).toFixed(1);
     if(!result.total){
       if(empty){empty.hidden=false;empty.innerHTML='<div class="empty-state">Data file भेटिएन।<br><small style="color:var(--text3)">कृपया <b>senioradvocatedata0.js</b> वा <b>advocatedata1.js</b> यही folder मा राख्नुहोस्।</small></div>';}
       console.warn('No advocate data loaded.');return;
     }
     initFilters();initColumns();state.filtered=DATA.slice();applySearch();
-    showToast(`${result.total.toLocaleString()} records loaded`);
+    showToast(`${result.total.toLocaleString()} records loaded in ${elapsed}s`);
   }catch(err){
     console.error('Boot error:',err);
     const empty=$('empty');
