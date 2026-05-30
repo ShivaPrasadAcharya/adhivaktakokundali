@@ -66,6 +66,7 @@
     .hero::after{content:'⚖';position:absolute;right:-4px;top:-18px;font-size:120px;opacity:.04;line-height:1;pointer-events:none;font-family:'Playfair Display',serif;color:var(--hero-text)}
     .hero h1{font-family:'Playfair Display',Georgia,serif;font-size:clamp(17px,2vw,26px);font-weight:700;color:var(--hero-text);line-height:1.1}
     .hero-sub{font-size:11px;color:var(--hero-sub);font-weight:400;margin-top:2px;letter-spacing:.02em}
+    .hero-time{margin-top:6px;font-size:12px;font-weight:600;color:var(--hero-text);background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);border-radius:999px;padding:4px 10px;display:inline-flex;align-items:center;letter-spacing:.04em}
     .hero-actions{display:flex;align-items:center;gap:6px;position:relative;z-index:1;flex-shrink:0}
 
     /* [FIX 2] Hero buttons use CSS vars */
@@ -339,13 +340,14 @@
 <header class="hero">
   <div style="position:relative;z-index:1">
     <h1>अधिवक्ता सूची</h1>
-    <p class="hero-sub">Nepal Bar Council &nbsp;·&nbsp; विकासकर्ता: शिवप्रसाद आचार्य &nbsp;·&nbsp; अद्यावधिक: २०८२</p>
+    <p class="hero-sub">source:Website of Nepal Bar Council  &nbsp;·&nbsp; Developer: शिवप्रसाद आचार्य &nbsp;·&nbsp; अद्यावधिक: २०८२</p>
   </div>
   <div class="hero-actions">
     <!-- [FIX 3] README link -->
     <a href="README.html" target="_blank" class="hbtn" aria-label="Open README" data-tip="README / Help">
       <i class="ph ph-book-open-text"></i>
     </a>
+    <div class="hero-time" id="kathmanduTime">00:00:00</div>
     <button id="themeBtn" class="hbtn" aria-label="Toggle theme" data-tip="Light / Dark">
       <i class="ph ph-moon-stars" id="themeIcon"></i>
     </button>
@@ -946,6 +948,18 @@ function setTheme(theme){
   localStorage.setItem('advTheme',theme);
   $('themeIcon').className=theme==='dark'?'ph ph-sun':'ph ph-moon-stars';
 }
+
+function getKathmanduTime(){
+  const dt=new Date();
+  const formatter=new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Kathmandu',hour:'2-digit',minute:'2-digit',second:'2-digit',hourCycle:'h23'});
+  return formatter.format(dt);
+}
+function updateKathmanduTime(){
+  const el=$('kathmanduTime');
+  if(el)el.textContent=getKathmanduTime();
+}
+setInterval(updateKathmanduTime,1000);
+updateKathmanduTime();
 
 /* ── [FIX 7] NAV DROPDOWN: hover-aware, close on outside click only ── */
 let navDropOpen=false;
