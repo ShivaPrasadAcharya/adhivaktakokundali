@@ -590,7 +590,7 @@
 /* ── DATA LOADING ── */
 let DATA=[];
 const DATA_CHUNK_PREFIX='advocatedata',DATA_CHUNK_EXT='.js',MAX_CHUNK_FILES=300,STOP_AFTER_MISSES=1;
-const COMMON_CUSTOM_DATA_FILES=['senioradvocatedata0.js'],OPTIONAL_DATA_MANIFEST='advocatedatafiles.js';
+const COMMON_CUSTOM_DATA_FILES=['advocatedata0.js'],OPTIONAL_DATA_MANIFEST='advocatedatafiles.js';
 const loadedChunks=new Map(),loadedScriptFiles=new Set();
 let anonymousChunkCounter=0;
 
@@ -1082,7 +1082,7 @@ async function bootTable(){
     clearInterval(timerId);
     const elapsed=((performance.now()-startTime)/1000).toFixed(1);
     if(!result.total){
-      if(empty){empty.hidden=false;empty.innerHTML='<div class="empty-state">Data file भेटिएन।<br><small style="color:var(--text3)">कृपया <b>senioradvocatedata0.js</b> वा <b>advocatedata1.js</b> यही folder मा राख्नुहोस्।</small></div>';}
+      if(empty){empty.hidden=false;empty.innerHTML='<div class="empty-state">Data file भेटिएन।<br><small style="color:var(--text3)">कृपया <b>advocatedata0.js</b> वा <b>advocatedata1.js</b> यही folder मा राख्नुहोस्।</small></div>';}
       console.warn('No advocate data loaded.');return;
     }
     initFilters();initColumns();state.filtered=DATA.slice();applySearch();
